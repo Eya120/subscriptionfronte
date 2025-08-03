@@ -24,7 +24,6 @@ import axios from "axios";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 
-
 const API_BASE = "http://localhost:3000/api"; // adapte selon ton backend
 
 const validationSchema = Yup.object({
@@ -42,22 +41,26 @@ const validationSchema = Yup.object({
 export default function Abonnements() {
   const [abonnements, setAbonnements] = useState([]);
   const [utilisateurs, setUtilisateurs] = useState([]);
-  const [typesAbonnement, setTypesAbonnement] = useState([]);
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingId, setEditingId] = useState(null);
 
-  // Chargement données
+  // Liste statique des types d'abonnement
+  const typesAbonnement = [
+    { id: 1, nom: "Mensuelle" },
+    { id: 2, nom: "Annuelle" },
+  ];
+
+  // Chargement données abonnements et utilisateurs
   useEffect(() => {
     Promise.all([
       axios.get(`${API_BASE}/abonnements`),
       axios.get(`${API_BASE}/utilisateurs`),
-      axios.get(`${API_BASE}/type-abonnements`),
+      // Plus besoin de charger types-abonnements depuis l'API
     ])
-      .then(([abRes, uRes, tRes]) => {
+      .then(([abRes, uRes]) => {
         setAbonnements(abRes.data);
         setUtilisateurs(uRes.data);
-        setTypesAbonnement(tRes.data);
       })
       .catch((e) => {
         console.error("Erreur chargement données", e);
@@ -275,7 +278,7 @@ export default function Abonnements() {
 
           <DialogActions>
             <Button onClick={handleCloseDialog}>Annuler</Button>
-            <Button type="submit" variant="contained" color="primary">
+            <Button variant="contained" type="submit">
               {editingId ? "Modifier" : "Ajouter"}
             </Button>
           </DialogActions>

@@ -14,6 +14,8 @@ import UserList from "./views/utilisateurs/UserList";
 import AbonnementsList from "app/views/abonnements/AbonnementsList";
 import ReservationList from "./views/reservation/reservationlist";
 import PaymentPage from "./views/payements/PaymentPage";
+import PaymentHistory from "./views/payements/PaymentHistory"; // Ajoute cette ligne
+import AccessList from "./views/access/AccessList";
 
 
 // DASHBOARD PAGE
@@ -35,6 +37,8 @@ const routes = [
       { path: "/abonnements", element: <AbonnementsList />, auth: authRoles.admin },
       { path: "/reservation", element: <ReservationList />, auth: authRoles.admin },
        { path: "/payements", element: <PaymentPage />, auth: authRoles.admin },
+       { path: "/payements/historique", element: <PaymentHistory />, auth: authRoles.admin },
+       {path: "/access",element: <AccessList />, auth: authRoles.admin},
    
       
     ]

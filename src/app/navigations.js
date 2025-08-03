@@ -26,21 +26,38 @@ const navigations = [
     
   },
 
+   {
+    name: "Access",
+    path: "/access",
+      icon: "event_note"
+    
+  },
+
   {
     name: "Reservations",
     path: "/reservation",
-    icon: "subscriptions"
+      icon: "event_note"
     
   },
 
   {
-    name: "Payements",
-    path: "/payemets",
-    icon: "subscriptions"
-    
+    name: "Paiements",
+    icon: "payment",
+    children: [
+      {
+        name: "Effectuer un Paiement",
+        path: "/payements",
+        icon: "send",
+      },
+      {
+        name: "Historique Paiements",
+        path: "/payements/historique",
+        icon: "credit_card",
+      },
+    ],
   },
-  
 
+  
 
   {
     name: "Documentation",
