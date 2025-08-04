@@ -24,7 +24,7 @@ import axios from "axios";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 
-const API_BASE = "http://localhost:3000/api"; // adapte selon ton backend
+const API_BASE = "http://localhost:3000/api/abonnements"; // adapte selon ton backend
 
 const validationSchema = Yup.object({
   utilisateurId: Yup.number().required("Utilisateur requis"),

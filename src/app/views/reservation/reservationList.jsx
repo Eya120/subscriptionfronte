@@ -40,7 +40,7 @@ const ReservationList = () => {
   const handleDelete = async (id) => {
     if (window.confirm("Confirmer la suppression ?")) {
       try {
-        await axios.delete(`http://localhost:3000/reservations/${id}`);
+        await axios.delete(`http://localhost:3000/api/reservations/${id}`);
         fetchReservations();
       } catch (error) {
         alert("Erreur lors de la suppression");

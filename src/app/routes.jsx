@@ -4,7 +4,6 @@ import { Navigate } from "react-router-dom";
 import AuthGuard from "./auth/AuthGuard";
 import { authRoles } from "./auth/authRoles";
 
-
 import Loadable from "./components/Loadable";
 import MatxLayout from "./components/MatxLayout/MatxLayout";
 import sessionRoutes from "./views/sessions/session-routes";
@@ -16,6 +15,13 @@ import ReservationList from "./views/reservation/reservationlist";
 import PaymentPage from "./views/payements/PaymentPage";
 import PaymentHistory from "./views/payements/PaymentHistory"; // Ajoute cette ligne
 import AccessList from "./views/access/AccessList";
+import TypeAbonnementList from "./views/parametrage/TypeAbonnementList";
+import RegleTarificationList from "./views/parametrage/RegleTarificationList";
+import HoraireOuvertureList from "./views/parametrage/HoraireOuvertureList";
+import Statistiques from "./views/Statistiques/statistiques"; // adapte le chemin si nécessaire
+
+
+
 
 
 // DASHBOARD PAGE
@@ -32,6 +38,7 @@ const routes = [
 
     children: [
       // dashboard route
+
       { path: "/dashboard/default", element: <Analytics />, auth: authRoles.admin },
       {path: "/utilisateurs", element: <UserList />,auth: authRoles.admin },
       { path: "/abonnements", element: <AbonnementsList />, auth: authRoles.admin },
@@ -39,6 +46,13 @@ const routes = [
        { path: "/payements", element: <PaymentPage />, auth: authRoles.admin },
        { path: "/payements/historique", element: <PaymentHistory />, auth: authRoles.admin },
        {path: "/access",element: <AccessList />, auth: authRoles.admin},
+       { path: "/parametrage/type-abonnement", element: <TypeAbonnementList />, auth: authRoles.admin },
+       { path: "/parametrage/regle-tarification", element: <RegleTarificationList />, auth: authRoles.admin },
+        { path: "/parametrage/horaire-ouverture", element: <HoraireOuvertureList />, auth: authRoles.admin },
+     {
+  path: "/statistiques",
+  element: <Statistiques />,
+}
    
       
     ]

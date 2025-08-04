@@ -33,10 +33,14 @@ const validationSchema = Yup.object({
   nom: Yup.string().required("Le nom est requis"),
   prenom: Yup.string().required("Le prénom est requis"),
   email: Yup.string().email("Email invalide").required("L'email est requis"),
-  role: Yup.string().oneOf(roleOptions.map((r) => r.value)).required("Le rôle est requis"),
+  role: Yup.string()
+    .oneOf(roleOptions.map((r) => r.value))
+    .required("Le rôle est requis"),
   password: Yup.string().when("id", {
     is: (id) => !id, // si pas d'id = création, password requis
-    then: Yup.string().required("Le mot de passe est requis").min(6, "Minimum 6 caractères"),
+    then: Yup.string()
+      .required("Le mot de passe est requis")
+      .min(6, "Minimum 6 caractères"),
     otherwise: Yup.string().notRequired(),
   }),
 });
@@ -46,18 +50,27 @@ export default function UserList() {
   const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
   const [editingUser, setEditingUser] = useState(null);
-  const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "success" });
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: "",
+    severity: "success",
+  });
 
   const fetchUsers = async () => {
+    setLoading(true);
     try {
-      const token = localStorage.getItem("accessToken");
-      const response = await axios.get("http://localhost:3000/utilisateurs", {
+      const token = localStorage.getItem("accessToken"); // <-- Correct here
+      const response = await axios.get("http://localhost:3000/api/utilisateurs", {
         headers: { Authorization: `Bearer ${token}` },
       });
       setUsers(response.data);
     } catch (error) {
       console.error("Erreur lors de la récupération des utilisateurs :", error);
-      setSnackbar({ open: true, message: "Erreur lors du chargement des utilisateurs", severity: "error" });
+      setSnackbar({
+        open: true,
+        message: "Erreur lors du chargement des utilisateurs",
+        severity: "error",
+      });
     } finally {
       setLoading(false);
     }
@@ -71,14 +84,22 @@ export default function UserList() {
     const token = localStorage.getItem("accessToken");
     if (window.confirm("Confirmer la suppression ?")) {
       try {
-        await axios.delete(`http://localhost:3000/utilisateurs/${userId}`, {
+        await axios.delete(`http://localhost:3000/api/utilisateurs/${userId}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         fetchUsers();
-        setSnackbar({ open: true, message: "Utilisateur supprimé avec succès", severity: "success" });
+        setSnackbar({
+          open: true,
+          message: "Utilisateur supprimé avec succès",
+          severity: "success",
+        });
       } catch (error) {
         console.error("Erreur lors de la suppression :", error);
-        setSnackbar({ open: true, message: "Erreur lors de la suppression", severity: "error" });
+        setSnackbar({
+          open: true,
+          message: "Erreur lors de la suppression",
+          severity: "error",
+        });
       }
     }
   };
@@ -94,7 +115,13 @@ export default function UserList() {
           <MaterialTable
             title=""
             columns={[
-              { title: "ID", field: "id", editable: "never" },
+              {
+                title: "ID",
+                field: "id",
+                editable: "never",
+                cellStyle: { paddingLeft: "20px" },
+                headerStyle: { paddingLeft: "20px" },
+              },
               { title: "Nom", field: "nom" },
               { title: "Prénom", field: "prenom" },
               { title: "Email", field: "email" },
@@ -150,12 +177,12 @@ export default function UserList() {
                 try {
                   const token = localStorage.getItem("accessToken");
                   if (values.id) {
-                    await axios.put(`http://localhost:3000/utilisateurs/${values.id}`, values, {
+                    await axios.put(`http://localhost:3000/api/utilisateurs/${values.id}`, values, {
                       headers: { Authorization: `Bearer ${token}` },
                     });
                     setSnackbar({ open: true, message: "Utilisateur modifié avec succès", severity: "success" });
                   } else {
-                    await axios.post("http://localhost:3000/utilisateurs", values, {
+                    await axios.post("http://localhost:3000/api/utilisateurs", values, {
                       headers: { Authorization: `Bearer ${token}` },
                     });
                     setSnackbar({ open: true, message: "Utilisateur créé avec succès", severity: "success" });
@@ -184,41 +211,16 @@ export default function UserList() {
                   )}
 
                   <Box sx={{ marginLeft: "0.5cm", marginRight: "0.5cm" }}>
-                    <Field
-                      as={TextField}
-                      name="nom"
-                      label="Nom"
-                      fullWidth
-                      margin="dense"
-                    />
+                    <Field as={TextField} name="nom" label="Nom" fullWidth margin="dense" />
                   </Box>
                   <Box sx={{ marginLeft: "0.5cm", marginRight: "0.5cm" }}>
-                    <Field
-                      as={TextField}
-                      name="prenom"
-                      label="Prénom"
-                      fullWidth
-                      margin="dense"
-                    />
+                    <Field as={TextField} name="prenom" label="Prénom" fullWidth margin="dense" />
                   </Box>
                   <Box sx={{ marginLeft: "0.5cm", marginRight: "0.5cm" }}>
-                    <Field
-                      as={TextField}
-                      name="email"
-                      label="Email"
-                      fullWidth
-                      margin="dense"
-                    />
+                    <Field as={TextField} name="email" label="Email" fullWidth margin="dense" />
                   </Box>
                   <Box sx={{ marginLeft: "0.5cm", marginRight: "0.5cm" }}>
-                    <Field
-                      name="role"
-                      label="Rôle"
-                      select
-                      fullWidth
-                      margin="dense"
-                      as={TextField}
-                    >
+                    <Field name="role" label="Rôle" select fullWidth margin="dense" as={TextField}>
                       {roleOptions.map((option) => (
                         <MenuItem key={option.value} value={option.value}>
                           {option.label}

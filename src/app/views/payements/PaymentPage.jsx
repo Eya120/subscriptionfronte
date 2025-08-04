@@ -26,7 +26,7 @@ const PaymentPage = () => {
   useEffect(() => {
     setLoadingAbonnements(true);
     axios
-      .get("http://localhost:3000/abonnements")
+      .get("http://localhost:3000/api/abonnements")
       .then((res) => {
         setAbonnements(res.data);
       })
@@ -69,7 +69,7 @@ const PaymentPage = () => {
     };
 
     axios
-      .post("http://localhost:3000/paiements", payload)
+      .post("http://localhost:3000/api/payements", payload)
       .then(() => {
         setMessage("Paiement effectué avec succès !");
         setSelectedAbonnement("");

@@ -1,5 +1,9 @@
 const navigations = [
-  { name: "Dashboard", path: "/dashboard/default", icon: "dashboard" },
+{
+  name: "Tableau de bord",
+  icon: "bar_chart",
+  path: "/statistiques",
+},
   { label: "PAGES", type: "label" },
   {
     name: "Auth",
@@ -57,14 +61,33 @@ const navigations = [
     ],
   },
 
-  
 
   {
-    name: "Documentation",
-    icon: "launch",
-    type: "extLink",
-    path: "http://demos.ui-lib.com/matx-react-doc/"
-  }
+  name: "Paramétrage",
+  icon: "settings",
+  children: [
+    {
+      name: "Type d’abonnement",
+      path: "/parametrage/type-abonnement",
+      icon: "category",
+    },
+    {
+      name: "Règle de tarification",
+      path: "/parametrage/regle-tarification",
+      icon: "attach_money",
+    },
+    {
+      name: "Horaire d’ouverture",
+      path: "/parametrage/horaire-ouverture",
+      icon: "access_time",
+    },
+  ],
+},
+
+  
+
+
+ 
 ];
 
 export default navigations;
