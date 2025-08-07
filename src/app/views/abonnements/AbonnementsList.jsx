@@ -23,6 +23,7 @@ import { Delete, Edit } from "@mui/icons-material";
 import axios from "axios";
 import { useFormik } from "formik";
 import * as Yup from "yup";
+import { useNavigate } from "react-router-dom"; // <-- import
 
 const API_BASE = "http://localhost:3000/api/abonnements"; // adapte selon ton backend
 
@@ -39,6 +40,7 @@ const validationSchema = Yup.object({
 });
 
 export default function Abonnements() {
+   const navigate = useNavigate(); 
   const [abonnements, setAbonnements] = useState([]);
   const [utilisateurs, setUtilisateurs] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -56,7 +58,6 @@ export default function Abonnements() {
     Promise.all([
       axios.get(`${API_BASE}/abonnements`),
       axios.get(`${API_BASE}/utilisateurs`),
-      // Plus besoin de charger types-abonnements depuis l'API
     ])
       .then(([abRes, uRes]) => {
         setAbonnements(abRes.data);
@@ -137,15 +138,21 @@ export default function Abonnements() {
 
   return (
     <Box p={3}>
-      <Typography variant="h4" gutterBottom>
+      <Typography variant="h4" gutterBottom textAlign="center" fontWeight="bold">
         Gestion des abonnements
       </Typography>
-      <Button variant="contained" onClick={() => handleOpenDialog(null)} sx={{ mb: 2 }}>
-        + Ajouter un abonnement
-      </Button>
+      <Box mb={2} display="flex" justifyContent="flex-end">
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={() => navigate("/abonnements/new")} // <-- redirection vers formulaire
+        >
+          Ajouter un abonnement
+        </Button>
+      </Box>
 
       <TableContainer component={Paper}>
-        <Table>
+        <Table size="small">
           <TableHead>
             <TableRow>
               <TableCell>Utilisateur</TableCell>
@@ -175,11 +182,11 @@ export default function Abonnements() {
                     <TableCell>{ab.dateFin.split("T")[0]}</TableCell>
                     <TableCell>{ab.tarifApplique.toFixed(2)}</TableCell>
                     <TableCell align="right">
-                      <IconButton color="primary" onClick={() => handleOpenDialog(ab)}>
-                        <Edit />
+                      <IconButton color="primary" onClick={() => handleOpenDialog(ab)} size="small">
+                        <Edit fontSize="small" />
                       </IconButton>
-                      <IconButton color="error" onClick={() => handleDelete(ab.id)}>
-                        <Delete />
+                      <IconButton color="error" onClick={() => handleDelete(ab.id)} size="small">
+                        <Delete fontSize="small" />
                       </IconButton>
                     </TableCell>
                   </TableRow>
@@ -191,21 +198,32 @@ export default function Abonnements() {
       </TableContainer>
 
       {/* Dialog formulaire */}
-      <Dialog open={dialogOpen} onClose={handleCloseDialog} maxWidth="sm" fullWidth>
-        <DialogTitle>{editingId ? "Modifier un abonnement" : "Ajouter un abonnement"}</DialogTitle>
-        <form onSubmit={formik.handleSubmit}>
-          <DialogContent dividers>
+      <Dialog open={dialogOpen} onClose={handleCloseDialog} maxWidth="xs" fullWidth>
+        <DialogTitle sx={{ textAlign: "center", fontWeight: "bold" }}>
+          {editingId ? "Modifier un abonnement" : "Ajouter un abonnement"}
+        </DialogTitle>
+
+        <form onSubmit={formik.handleSubmit} noValidate>
+          <DialogContent
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              gap: 2,
+              pt: 1,
+              pb: 1,
+            }}
+          >
             <TextField
               select
-              fullWidth
-              margin="normal"
               label="Utilisateur"
               name="utilisateurId"
               value={formik.values.utilisateurId}
               onChange={formik.handleChange}
               error={formik.touched.utilisateurId && Boolean(formik.errors.utilisateurId)}
               helperText={formik.touched.utilisateurId && formik.errors.utilisateurId}
+              fullWidth
               required
+              size="small"
             >
               {utilisateurs.map((u) => (
                 <MenuItem key={u.id} value={u.id}>
@@ -216,15 +234,15 @@ export default function Abonnements() {
 
             <TextField
               select
-              fullWidth
-              margin="normal"
               label="Type d'abonnement"
               name="typeAbonnementId"
               value={formik.values.typeAbonnementId}
               onChange={formik.handleChange}
               error={formik.touched.typeAbonnementId && Boolean(formik.errors.typeAbonnementId)}
               helperText={formik.touched.typeAbonnementId && formik.errors.typeAbonnementId}
+              fullWidth
               required
+              size="small"
             >
               {typesAbonnement.map((t) => (
                 <MenuItem key={t.id} value={t.id}>
@@ -234,8 +252,6 @@ export default function Abonnements() {
             </TextField>
 
             <TextField
-              fullWidth
-              margin="normal"
               label="Date début"
               type="date"
               name="dateDebut"
@@ -244,12 +260,12 @@ export default function Abonnements() {
               onChange={formik.handleChange}
               error={formik.touched.dateDebut && Boolean(formik.errors.dateDebut)}
               helperText={formik.touched.dateDebut && formik.errors.dateDebut}
+              fullWidth
               required
+              size="small"
             />
 
             <TextField
-              fullWidth
-              margin="normal"
               label="Date fin"
               type="date"
               name="dateFin"
@@ -258,27 +274,36 @@ export default function Abonnements() {
               onChange={formik.handleChange}
               error={formik.touched.dateFin && Boolean(formik.errors.dateFin)}
               helperText={formik.touched.dateFin && formik.errors.dateFin}
+              fullWidth
               required
+              size="small"
             />
 
             <TextField
-              fullWidth
-              margin="normal"
               label="Tarif (€)"
               type="number"
-              inputProps={{ step: "0.01", min: "0" }}
               name="tarifApplique"
+              inputProps={{ step: "0.01", min: "0" }}
               value={formik.values.tarifApplique}
               onChange={formik.handleChange}
               error={formik.touched.tarifApplique && Boolean(formik.errors.tarifApplique)}
               helperText={formik.touched.tarifApplique && formik.errors.tarifApplique}
+              fullWidth
               required
+              size="small"
             />
           </DialogContent>
 
-          <DialogActions>
-            <Button onClick={handleCloseDialog}>Annuler</Button>
-            <Button variant="contained" type="submit">
+          <DialogActions sx={{ justifyContent: "center", pb: 2 }}>
+            <Button variant="outlined" onClick={handleCloseDialog} sx={{ minWidth: 100 }}>
+              Annuler
+            </Button>
+            <Button
+              variant="contained"
+              type="submit"
+              disabled={formik.isSubmitting}
+              sx={{ minWidth: 100 }}
+            >
               {editingId ? "Modifier" : "Ajouter"}
             </Button>
           </DialogActions>

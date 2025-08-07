@@ -1,15 +1,11 @@
-import React, { useState, useEffect } from "react";
-import axios from "axios";
+import React, { useEffect, useState } from "react";
 import {
-  TextField,
-  Button,
-  MenuItem,
-  Box,
-  Typography,
-  Alert,
+  TextField, Button, MenuItem, Box, Typography, Alert,
+  CircularProgress, Stack,
 } from "@mui/material";
 import { Formik, Form } from "formik";
 import * as Yup from "yup";
+import { useParams, useNavigate } from "react-router-dom";
 
 const reservationSchema = Yup.object().shape({
   abonnementId: Yup.number().required("Abonnement requis"),
@@ -20,29 +16,56 @@ const reservationSchema = Yup.object().shape({
   heureFin: Yup.string().required("Heure de fin requise"),
 });
 
-const ReservationForm = ({ mode = "create", reservation = null, onClose }) => {
-  const [abonnements, setAbonnements] = useState([]);
-  const [services, setServices] = useState([]);
-  const [utilisateurs, setUtilisateurs] = useState([]);
-  const [successMessage, setSuccessMessage] = useState("");
+const ReservationForm = () => {
+  const { id } = useParams(); // id de la réservation, undefined si création
+  const navigate = useNavigate();
+
+  const [dataSources, setDataSources] = useState({
+    abonnements: [],
+    services: [],
+    utilisateurs: [],
+  });
+  const [reservation, setReservation] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [submitLoading, setSubmitLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
 
-  // Charger abonnements, services, utilisateurs au montage
+  // Charger abonnements, services, utilisateurs et si id, charger réservation
   useEffect(() => {
-    // Remplace par tes appels axios vers ton backend pour ces données
-    setAbonnements([
-      { id: 1, nom: "Mensuel" },
-      { id: 2, nom: "Annuel" },
-    ]);
+    const fetchData = async () => {
+      try {
+        const [resAbonnements, resServices, resUsers] = await Promise.all([
+          fetch("http://localhost:3000/api/abonnements"),
+          fetch("http://localhost:3000/api/services"),
+          fetch("http://localhost:3000/api/utilisateurs"),
+        ]);
+        const abonnementsData = await resAbonnements.json();
+        const servicesData = await resServices.json();
+        const utilisateursData = await resUsers.json();
 
-  }, []);
+        setDataSources({ abonnements: abonnementsData, services: servicesData, utilisateurs: utilisateursData });
+
+        if (id) {
+          const resReservation = await fetch(`http://localhost:3000/api/reservations/${id}`);
+          const reservationData = await resReservation.json();
+          setReservation(reservationData);
+        }
+        setLoading(false);
+      } catch (error) {
+        setErrorMessage("Erreur lors du chargement des données");
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, [id]);
 
   const initialValues = reservation
     ? {
         abonnementId: reservation.abonnementId,
         serviceId: reservation.serviceId,
         utilisateurId: reservation.utilisateurId,
-        dateReservation: reservation.dateReservation,
+        dateReservation: reservation.dateReservation.split("T")[0],
         heureDebut: reservation.heureDebut,
         heureFin: reservation.heureFin,
       }
@@ -56,35 +79,50 @@ const ReservationForm = ({ mode = "create", reservation = null, onClose }) => {
       };
 
   const handleSubmit = async (values, { resetForm }) => {
+    setSubmitLoading(true);
+    setErrorMessage("");
+    setSuccessMessage("");
+
     try {
-      setSuccessMessage("");
-      setErrorMessage("");
-
-      if (mode === "create") {
-        await axios.post("http://localhost:3000/reservations", values);
-        setSuccessMessage("Réservation créée avec succès !");
-      } else {
-        await axios.put(`http://localhost:3000/reservations/${reservation.id}`, values);
+      if (id) {
+        await fetch(`http://localhost:3000/api/reservations/${id}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(values),
+        });
         setSuccessMessage("Réservation mise à jour avec succès !");
+      } else {
+        await fetch("http://localhost:3000/api/reservations", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(values),
+        });
+        setSuccessMessage("Réservation créée avec succès !");
       }
-
       resetForm();
-      if (onClose) onClose();
+      setTimeout(() => navigate("/reservations"), 1000); // Retour à la liste après succès
     } catch (error) {
-      setErrorMessage(
-        error.response?.data?.message || "Erreur lors de la sauvegarde de la réservation"
-      );
+      setErrorMessage(error.message || "Erreur lors de la sauvegarde.");
     }
+    setSubmitLoading(false);
   };
 
+  if (loading) {
+    return (
+      <Box display="flex" justifyContent="center" mt={5}>
+        <CircularProgress />
+      </Box>
+    );
+  }
+
   return (
-    <Box maxWidth={600} mx="auto" mt={5} p={3} boxShadow={3} borderRadius={2}>
-      <Typography variant="h5" mb={3}>
-        {mode === "create" ? "Nouvelle Réservation" : "Modifier la Réservation"}
+    <Box maxWidth={600} mx="auto" mt={4} p={3} boxShadow={3} borderRadius={2} bgcolor="#fff">
+      <Typography variant="h5" mb={3} textAlign="center">
+        {id ? "Modifier la Réservation" : "Nouvelle Réservation"}
       </Typography>
 
-      {successMessage && <Alert severity="success">{successMessage}</Alert>}
-      {errorMessage && <Alert severity="error">{errorMessage}</Alert>}
+      {successMessage && <Alert severity="success" sx={{ mb: 2 }}>{successMessage}</Alert>}
+      {errorMessage && <Alert severity="error" sx={{ mb: 2 }}>{errorMessage}</Alert>}
 
       <Formik
         enableReinitialize
@@ -93,7 +131,7 @@ const ReservationForm = ({ mode = "create", reservation = null, onClose }) => {
         onSubmit={handleSubmit}
       >
         {({ errors, touched, handleChange, values }) => (
-          <Form>
+          <Form noValidate>
             <TextField
               select
               fullWidth
@@ -105,9 +143,9 @@ const ReservationForm = ({ mode = "create", reservation = null, onClose }) => {
               error={touched.abonnementId && Boolean(errors.abonnementId)}
               helperText={touched.abonnementId && errors.abonnementId}
             >
-              {abonnements.map((option) => (
-                <MenuItem key={option.id} value={option.id}>
-                  {option.nom}
+              {dataSources.abonnements.map((abonnement) => (
+                <MenuItem key={abonnement.id} value={abonnement.id}>
+                  {abonnement.nom}
                 </MenuItem>
               ))}
             </TextField>
@@ -123,9 +161,9 @@ const ReservationForm = ({ mode = "create", reservation = null, onClose }) => {
               error={touched.serviceId && Boolean(errors.serviceId)}
               helperText={touched.serviceId && errors.serviceId}
             >
-              {services.map((option) => (
-                <MenuItem key={option.id} value={option.id}>
-                  {option.nom}
+              {dataSources.services.map((service) => (
+                <MenuItem key={service.id} value={service.id}>
+                  {service.nom}
                 </MenuItem>
               ))}
             </TextField>
@@ -141,9 +179,9 @@ const ReservationForm = ({ mode = "create", reservation = null, onClose }) => {
               error={touched.utilisateurId && Boolean(errors.utilisateurId)}
               helperText={touched.utilisateurId && errors.utilisateurId}
             >
-              {utilisateurs.map((option) => (
-                <MenuItem key={option.id} value={option.id}>
-                  {option.nom}
+              {dataSources.utilisateurs.map((user) => (
+                <MenuItem key={user.id} value={user.id}>
+                  {user.nom}
                 </MenuItem>
               ))}
             </TextField>
@@ -158,50 +196,56 @@ const ReservationForm = ({ mode = "create", reservation = null, onClose }) => {
               onChange={handleChange}
               error={touched.dateReservation && Boolean(errors.dateReservation)}
               helperText={touched.dateReservation && errors.dateReservation}
-              InputLabelProps={{
-                shrink: true,
-              }}
+              InputLabelProps={{ shrink: true }}
             />
 
-            <TextField
+            <Stack direction="row" spacing={2} mt={2}>
+              <TextField
+                fullWidth
+                type="time"
+                label="Heure de début"
+                name="heureDebut"
+                value={values.heureDebut}
+                onChange={handleChange}
+                error={touched.heureDebut && Boolean(errors.heureDebut)}
+                helperText={touched.heureDebut && errors.heureDebut}
+                InputLabelProps={{ shrink: true }}
+              />
+              <TextField
+                fullWidth
+                type="time"
+                label="Heure de fin"
+                name="heureFin"
+                value={values.heureFin}
+                onChange={handleChange}
+                error={touched.heureFin && Boolean(errors.heureFin)}
+                helperText={touched.heureFin && errors.heureFin}
+                InputLabelProps={{ shrink: true }}
+              />
+            </Stack>
+
+            <Button
+              variant="contained"
+              color="primary"
+              type="submit"
+              sx={{ mt: 3 }}
               fullWidth
-              margin="normal"
-              type="datetime-local"
-              label="Heure de début"
-              name="heureDebut"
-              value={values.heureDebut}
-              onChange={handleChange}
-              error={touched.heureDebut && Boolean(errors.heureDebut)}
-              helperText={touched.heureDebut && errors.heureDebut}
-              InputLabelProps={{
-                shrink: true,
-              }}
-            />
-
-            <TextField
-              fullWidth
-              margin="normal"
-              type="datetime-local"
-              label="Heure de fin"
-              name="heureFin"
-              value={values.heureFin}
-              onChange={handleChange}
-              error={touched.heureFin && Boolean(errors.heureFin)}
-              helperText={touched.heureFin && errors.heureFin}
-              InputLabelProps={{
-                shrink: true,
-              }}
-            />
-
-            <Button variant="contained" color="primary" type="submit" sx={{ mt: 3 }} fullWidth>
-              {mode === "create" ? "Réserver" : "Mettre à jour"}
+              disabled={submitLoading}
+              startIcon={submitLoading && <CircularProgress size={20} />}
+            >
+              {id ? "Mettre à jour" : "Réserver"}
             </Button>
 
-            {onClose && (
-              <Button variant="outlined" color="secondary" sx={{ mt: 2 }} fullWidth onClick={onClose}>
-                Annuler
-              </Button>
-            )}
+            <Button
+              variant="outlined"
+              color="primary"
+              sx={{ mt: 2 }}
+              fullWidth
+              onClick={() => navigate("/reservation")}
+              disabled={submitLoading}
+            >
+              Annuler
+            </Button>
           </Form>
         )}
       </Formik>

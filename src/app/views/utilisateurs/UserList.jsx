@@ -5,18 +5,14 @@ import {
   Dialog,
   DialogTitle,
   DialogContent,
-  DialogActions,
-  TextField,
-  Button,
-  MenuItem,
   Snackbar,
   Alert,
 } from "@mui/material";
 import MaterialTable from "material-table";
 import axios from "axios";
 import { SimpleCard } from "app/components";
-import { Formik, Form, Field } from "formik";
-import * as Yup from "yup";
+import UserForm from "./UserForm";
+import { Typography } from "@mui/material";
 
 const roleOptions = [
   { value: "admin", label: "Administrateur" },
@@ -28,22 +24,6 @@ const roleLabel = (role) => {
   const found = roleOptions.find((r) => r.value === role);
   return found ? found.label : role;
 };
-
-const validationSchema = Yup.object({
-  nom: Yup.string().required("Le nom est requis"),
-  prenom: Yup.string().required("Le prénom est requis"),
-  email: Yup.string().email("Email invalide").required("L'email est requis"),
-  role: Yup.string()
-    .oneOf(roleOptions.map((r) => r.value))
-    .required("Le rôle est requis"),
-  password: Yup.string().when("id", {
-    is: (id) => !id, // si pas d'id = création, password requis
-    then: Yup.string()
-      .required("Le mot de passe est requis")
-      .min(6, "Minimum 6 caractères"),
-    otherwise: Yup.string().notRequired(),
-  }),
-});
 
 export default function UserList() {
   const [users, setUsers] = useState([]);
@@ -59,13 +39,12 @@ export default function UserList() {
   const fetchUsers = async () => {
     setLoading(true);
     try {
-      const token = localStorage.getItem("accessToken"); // <-- Correct here
+      const token = localStorage.getItem("accessToken");
       const response = await axios.get("http://localhost:3000/api/utilisateurs", {
         headers: { Authorization: `Bearer ${token}` },
       });
       setUsers(response.data);
     } catch (error) {
-      console.error("Erreur lors de la récupération des utilisateurs :", error);
       setSnackbar({
         open: true,
         message: "Erreur lors du chargement des utilisateurs",
@@ -94,7 +73,6 @@ export default function UserList() {
           severity: "success",
         });
       } catch (error) {
-        console.error("Erreur lors de la suppression :", error);
         setSnackbar({
           open: true,
           message: "Erreur lors de la suppression",
@@ -104,9 +82,36 @@ export default function UserList() {
     }
   };
 
+  const handleFormSubmit = async (values, { setSubmitting }) => {
+    try {
+      const token = localStorage.getItem("accessToken");
+      if (values.id) {
+        await axios.put(`http://localhost:3000/api/utilisateurs/${values.id}`, values, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setSnackbar({ open: true, message: "Utilisateur modifié avec succès", severity: "success" });
+      } else {
+        // Plus de création via ce formulaire (ajout supprimé)
+        setSnackbar({ open: true, message: "Ajout désactivé", severity: "warning" });
+      }
+      setOpen(false);
+      fetchUsers();
+    } catch (error) {
+      setSnackbar({ open: true, message: "Erreur lors de la sauvegarde", severity: "error" });
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   return (
     <Box m={-1}>
-      <SimpleCard title="Liste des utilisateurs">
+      <SimpleCard
+  title={
+    <Typography variant="h4" mb={3} textAlign="center" fontWeight="bold">
+      Liste des utilisateurs
+    </Typography>
+  }
+>
         {loading ? (
           <Box display="flex" justifyContent="center" p={4}>
             <CircularProgress />
@@ -153,15 +158,6 @@ export default function UserList() {
                 tooltip: "Supprimer",
                 onClick: (event, rowData) => handleDelete(rowData.id),
               },
-              {
-                icon: "add",
-                tooltip: "Ajouter un utilisateur",
-                isFreeAction: true,
-                onClick: () => {
-                  setEditingUser({ nom: "", prenom: "", email: "", role: "" });
-                  setOpen(true);
-                },
-              },
             ]}
           />
         )}
@@ -169,95 +165,11 @@ export default function UserList() {
         <Dialog open={open} onClose={() => setOpen(false)} maxWidth="sm" fullWidth>
           <DialogTitle>{editingUser?.id ? "Modifier" : "Créer"} un utilisateur</DialogTitle>
           <DialogContent>
-            <Formik
+            <UserForm
               initialValues={editingUser || { nom: "", prenom: "", email: "", role: "", password: "" }}
-              validationSchema={validationSchema}
-              enableReinitialize
-              onSubmit={async (values, { setSubmitting }) => {
-                try {
-                  const token = localStorage.getItem("accessToken");
-                  if (values.id) {
-                    await axios.put(`http://localhost:3000/api/utilisateurs/${values.id}`, values, {
-                      headers: { Authorization: `Bearer ${token}` },
-                    });
-                    setSnackbar({ open: true, message: "Utilisateur modifié avec succès", severity: "success" });
-                  } else {
-                    await axios.post("http://localhost:3000/api/utilisateurs", values, {
-                      headers: { Authorization: `Bearer ${token}` },
-                    });
-                    setSnackbar({ open: true, message: "Utilisateur créé avec succès", severity: "success" });
-                  }
-                  setOpen(false);
-                  fetchUsers();
-                } catch (error) {
-                  console.error("Erreur lors de la sauvegarde :", error.response?.data || error.message);
-                  setSnackbar({ open: true, message: "Erreur lors de la sauvegarde", severity: "error" });
-                } finally {
-                  setSubmitting(false);
-                }
-              }}
-            >
-              {({ submitForm, isSubmitting, isValid }) => (
-                <Form>
-                  {editingUser?.id && (
-                    <Field
-                      as={TextField}
-                      name="id"
-                      label="ID"
-                      fullWidth
-                      margin="dense"
-                      disabled
-                    />
-                  )}
-
-                  <Box sx={{ marginLeft: "0.5cm", marginRight: "0.5cm" }}>
-                    <Field as={TextField} name="nom" label="Nom" fullWidth margin="dense" />
-                  </Box>
-                  <Box sx={{ marginLeft: "0.5cm", marginRight: "0.5cm" }}>
-                    <Field as={TextField} name="prenom" label="Prénom" fullWidth margin="dense" />
-                  </Box>
-                  <Box sx={{ marginLeft: "0.5cm", marginRight: "0.5cm" }}>
-                    <Field as={TextField} name="email" label="Email" fullWidth margin="dense" />
-                  </Box>
-                  <Box sx={{ marginLeft: "0.5cm", marginRight: "0.5cm" }}>
-                    <Field name="role" label="Rôle" select fullWidth margin="dense" as={TextField}>
-                      {roleOptions.map((option) => (
-                        <MenuItem key={option.value} value={option.value}>
-                          {option.label}
-                        </MenuItem>
-                      ))}
-                    </Field>
-                  </Box>
-
-                  {!editingUser?.id && (
-                    <Box sx={{ marginLeft: "0.5cm", marginRight: "0.5cm" }}>
-                      <Field
-                        as={TextField}
-                        type="password"
-                        name="password"
-                        label="Mot de passe"
-                        fullWidth
-                        margin="dense"
-                      />
-                    </Box>
-                  )}
-
-                  <DialogActions>
-                    <Button onClick={() => setOpen(false)} disabled={isSubmitting}>
-                      Annuler
-                    </Button>
-                    <Button
-                      onClick={submitForm}
-                      variant="contained"
-                      color="primary"
-                      disabled={isSubmitting || !isValid}
-                    >
-                      {editingUser?.id ? "Modifier" : "Créer"}
-                    </Button>
-                  </DialogActions>
-                </Form>
-              )}
-            </Formik>
+              onSubmit={handleFormSubmit}
+              onCancel={() => setOpen(false)}
+            />
           </DialogContent>
         </Dialog>
       </SimpleCard>

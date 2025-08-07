@@ -15,20 +15,40 @@ const navigations = [
       { name: "Error", iconText: "404", path: "/session/404" }
     ]
   },
- 
-  {
-    name: "Utilisateurs",
-    path: "/utilisateurs",
-    icon: "group",
-    iconText: "U",
-  },
 
-  {
+   {
     name: "Abonnements",
-    path: "/abonnements",
-    icon: "subscriptions"
-    
+    icon: "subscriptions",
+    children: [
+      {
+        name: "Liste des abonnements",
+        path: "/abonnements",
+        icon: "list_alt",
+      },
+      {
+        name: "Ajouter un abonnement",
+        path: "/abonnements/new",
+        icon: "add_circle",
+      }
+    ]
   },
+ 
+{
+  name: "Utilisateurs",
+  icon: "group",
+  children: [
+    {
+      name: "Liste des utilisateurs",
+      path: "/utilisateurs",
+      icon: "list_alt",
+    },
+    {
+      name: "Ajouter un utilisateur",
+      path: "/utilisateurs/new",
+      icon: "add_circle",
+    }
+  ],
+},
 
    {
     name: "Access",
@@ -37,13 +57,22 @@ const navigations = [
     
   },
 
-  {
-    name: "Reservations",
-    path: "/reservation",
-      icon: "event_note"
-    
-  },
-
+ {
+  name: "Réservations",
+  icon: "event_note",
+  children: [
+    {
+      name: "Nouvelle réservation",
+      path: "/reservation/new",
+      icon: "add_circle",
+    },
+    {
+      name: "Liste des réservations",
+      path: "/reservation/liste",
+      icon: "list_alt",
+    },
+  ],
+},
   {
     name: "Paiements",
     icon: "payment",
