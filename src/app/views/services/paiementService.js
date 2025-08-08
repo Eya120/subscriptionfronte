@@ -1,36 +1,36 @@
 import axios from "axios";
 
-const API_URL = "http://localhost:3000/reservations";
+const API_URL = "http://localhost:3000/paiements";
 
-const getAllReservations = async (token) => {
+const getAllPayments = async (token) => {
   const res = await axios.get(API_URL, {
     headers: { Authorization: `Bearer ${token}` },
   });
   return res.data;
 };
 
-const getReservationById = async (id, token) => {
+const getPaymentById = async (id, token) => {
   const res = await axios.get(`${API_URL}/${id}`, {
     headers: { Authorization: `Bearer ${token}` },
   });
   return res.data;
 };
 
-const createReservation = async (data, token) => {
+const createPayment = async (data, token) => {
   const res = await axios.post(API_URL, data, {
     headers: { Authorization: `Bearer ${token}` },
   });
   return res.data;
 };
 
-const updateReservation = async (id, data, token) => {
+const updatePayment = async (id, data, token) => {
   const res = await axios.put(`${API_URL}/${id}`, data, {
     headers: { Authorization: `Bearer ${token}` },
   });
   return res.data;
 };
 
-const deleteReservation = async (id, token) => {
+const deletePayment = async (id, token) => {
   const res = await axios.delete(`${API_URL}/${id}`, {
     headers: { Authorization: `Bearer ${token}` },
   });
@@ -38,9 +38,9 @@ const deleteReservation = async (id, token) => {
 };
 
 export {
-  getAllReservations,
-  getReservationById,
-  createReservation,
-  updateReservation,
-  deleteReservation,
+  getAllPayments,
+  getPaymentById,
+  createPayment,
+  updatePayment,
+  deletePayment,
 };

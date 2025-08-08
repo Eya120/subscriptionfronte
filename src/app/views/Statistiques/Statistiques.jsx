@@ -28,7 +28,7 @@ import CardMembershipIcon from "@mui/icons-material/CardMembership";
 import EventAvailableIcon from "@mui/icons-material/EventAvailable";
 import MonetizationOnIcon from "@mui/icons-material/MonetizationOn";
 
-const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#AF19FF", "#FF4560"];
+const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#AF19FF", "#eb546aff"];
 
 export default function Statistiques() {
   const [resume, setResume] = useState({});

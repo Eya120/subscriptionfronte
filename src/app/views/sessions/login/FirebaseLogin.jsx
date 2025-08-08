@@ -122,10 +122,7 @@ export default function FirebaseLogin() {
         <Grid container>
           <Grid size={{ md: 6, xs: 12 }}>
             <div className="cardLeft">
-              <Logo>
-                <MatxLogo /> <span>MatX Pro</span>
-              </Logo>
-
+              
               <h1 className="mainTitle">Admin Dashboard</h1>
 
               <div className="features">
@@ -137,7 +134,7 @@ export default function FirebaseLogin() {
               <Span flexGrow={1}></Span>
 
               <a href="https://ui-lib.com/" target="_blank" rel="noopener noreferrer">
-                <img src="/assets/images/logos/ui-lib.png" alt="UI Lib Logo" />
+                
               </a>
             </div>
           </Grid>

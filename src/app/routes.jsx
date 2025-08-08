@@ -17,14 +17,21 @@ import AbonnementsForm from "app/views/abonnements/AbonnementsForm";
 import ReservationList from "./views/reservation/ReservationList";
 import ReservationForm from "./views/reservation/ReservationForm";
 
-import PaymentPage from "./views/payements/PaymentPage";
-import PaymentHistory from "./views/payements/PaymentHistory"; // Ajoute cette ligne
+import PaiementsForm from "./views/payements/PaiementsForm";
+import PaiementList from "./views/payements/PaiementList";
 
 import AccessList from "./views/access/AccessList";
+import AccessForm from "./views/access/AccessForm";
 
-import TypeAbonnementList from "./views/parametrage/TypeAbonnementList";
-import RegleTarificationList from "./views/parametrage/RegleTarificationList";
-import HoraireOuvertureList from "./views/parametrage/HoraireOuvertureList";
+import TypeAbonnementList from "./views/parametrage/TypeAbonnement/TypeAbonnementList";
+import TypeAbonnementForm from "./views/parametrage/TypeAbonnement/TypeAbonnementForm";
+
+import RegleTarificationList from "./views/parametrage/RegleTarification/RegleTarificationList";
+import RegleTarificationForm from "./views/parametrage/RegleTarification/RegleTarificationForm";
+
+import HoraireOuvertureList from "./views/parametrage/HoraireOuverture/HoraireOuvertureList";
+import HoraireOuvertureForm from "./views/parametrage/HoraireOuverture/HoraireOuvertureForm";
+
 
 import Statistiques from "./views/Statistiques/statistiques"; // adapte le chemin si nécessaire
 
@@ -60,21 +67,36 @@ const routes = [
       {path: "/abonnements/new",element: <AbonnementsForm mode="create" />,auth: authRoles.admin},
       {path: "/abonnements/edit/:id",element: <AbonnementsForm mode="edit" />,auth: authRoles.admin},
      
-      {name: 'Réservations',icon: 'event_note',children: [
+      
       { path: '/reservation',element: <ReservationList />},
-      { name: 'Liste des réservations',path: '/reservation/liste', element: <ReservationList />},
-      { name: 'Ajouter une réservation', path: '/reservation/new', element: <ReservationForm />},
+      { path: '/reservation/liste', element: <ReservationList />},
+      {  path: '/reservation/new', element: <ReservationForm />},
       { path:"/reservation/edit/:id" ,element:<ReservationFormWrapper mode="edit"/>},
-  ],
-},
+  
 
-       { path: "/payements", element: <PaymentPage />, auth: authRoles.admin },
-       { path: "/payements/historique", element: <PaymentHistory />, auth: authRoles.admin },
-       {path: "/access",element: <AccessList />, auth: authRoles.admin},
+
+       { path: "/payements/new", element: <PaiementsForm />, auth: authRoles.admin },
+       { path: "/payements/historique", element: <PaiementList />, auth: authRoles.admin },
+       {path: "/paiements/edit/:id", element: <PaiementsForm />},
+       
+       {path: "/access", element: <AccessList />},
+       {path: "/access/new",element: <AccessForm />},
+       {path: "/access/:id",element: <AccessForm />},
+
        { path: "/parametrage/type-abonnement", element: <TypeAbonnementList />, auth: authRoles.admin },
-       { path: "/parametrage/regle-tarification", element: <RegleTarificationList />, auth: authRoles.admin },
-        { path: "/parametrage/horaire-ouverture", element: <HoraireOuvertureList />, auth: authRoles.admin },
-    
+       { path: "/parametrage/type-abonnement/new", element: <TypeAbonnementForm />, auth: authRoles.admin },
+       { path: "/parametrage/type-abonnement/:id", element: <TypeAbonnementForm />, auth: authRoles.admin }, 
+
+       {path: "/parametrage/regle-tarification", element: <RegleTarificationList />,auth: authRoles.admin},
+       {path: "/parametrage/regle-tarification/new",element: <RegleTarificationForm />,auth: authRoles.admin},
+       {path: "/parametrage/regle-tarification/edit/:id",element: <RegleTarificationForm />,auth: authRoles.admin},
+
+       { path: "/parametrage/horaire-ouverture", element: <HoraireOuvertureList />, auth: authRoles.admin },
+       { path: "/parametrage/horaire-ouverture/new", element: <HoraireOuvertureForm />, auth: authRoles.admin },
+       { path: "/parametrage/horaire-ouverture/edit/:id", element: <HoraireOuvertureForm />, auth: authRoles.admin },
+
+
+
         {path: "/statistiques",element: <Statistiques />}
    
       

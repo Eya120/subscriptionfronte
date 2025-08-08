@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
 import {
-  Button, Table, TableHead, TableRow, TableCell, TableBody,
-  Box, Typography, CircularProgress, Stack, IconButton, Tooltip, Dialog, DialogTitle, DialogContent, DialogActions,
+  Box, Typography, CircularProgress, Stack, IconButton, Tooltip, Button,
+  Dialog, DialogTitle, DialogContent, DialogActions,
 } from "@mui/material";
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useNavigate } from "react-router-dom";
+import GenericTable from "../../components/GenericTable"; // Chemin vers ton composant générique
 
 const ReservationList = () => {
   const [reservations, setReservations] = useState([]);
@@ -49,17 +50,46 @@ const ReservationList = () => {
     }
   };
 
+  // Définition des colonnes pour GenericTable
+  const columns = [
+    { header: "Utilisateur", field: "utilisateurNom" },
+    { header: "Abonnement", field: "abonnementNom" },
+    { header: "Service", field: "serviceNom" },
+    { 
+      header: "Date", 
+      field: "dateReservation", 
+      render: (row) => new Date(row.dateReservation).toLocaleDateString() 
+    },
+    { header: "Heure début", field: "heureDebut" },
+    { header: "Heure fin", field: "heureFin" },
+    {
+      header: "Actions",
+      render: (row) => (
+        <Stack direction="row" spacing={1} justifyContent="center">
+          <Tooltip title="Modifier">
+            <IconButton color="primary" onClick={() => navigate(`/reservations/edit/${row.id}`)} size="small">
+              <EditIcon />
+            </IconButton>
+          </Tooltip>
+          <Tooltip title="Supprimer">
+            <IconButton color="error" onClick={() => handleDeleteClick(row.id)} size="small">
+              <DeleteIcon />
+            </IconButton>
+          </Tooltip>
+        </Stack>
+      ),
+    },
+  ];
+
   return (
     <Box maxWidth={1100} mx="auto" mt={5} p={3} boxShadow={3} borderRadius={2} bgcolor="#fafafa">
-      <Typography variant="h4" mb={3} textAlign="center" fontWeight="bold">Gestion des Réservations</Typography>
+      <Typography variant="h4" mb={3} textAlign="center" fontWeight="bold">
+        Gestion des Réservations
+      </Typography>
 
       <Box mb={2} display="flex" justifyContent="flex-end">
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={() => navigate("/reservation/new")}
-        >
-          Nouvelle réservation
+        <Button variant="contained" color="primary" onClick={() => navigate("/reservation/new")}>
+          + Nouvelle réservation
         </Button>
       </Box>
 
@@ -68,51 +98,12 @@ const ReservationList = () => {
           <CircularProgress />
         </Box>
       ) : (
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>Utilisateur</TableCell>
-              <TableCell>Abonnement</TableCell>
-              <TableCell>Service</TableCell>
-              <TableCell>Date</TableCell>
-              <TableCell>Heure début</TableCell>
-              <TableCell>Heure fin</TableCell>
-              <TableCell align="center">Actions</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {reservations.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={7} align="center">Aucune réservation trouvée.</TableCell>
-              </TableRow>
-            ) : (
-              reservations.map((res) => (
-                <TableRow key={res.id}>
-                  <TableCell>{res.utilisateurNom}</TableCell>
-                  <TableCell>{res.abonnementNom}</TableCell>
-                  <TableCell>{res.serviceNom}</TableCell>
-                  <TableCell>{new Date(res.dateReservation).toLocaleDateString()}</TableCell>
-                  <TableCell>{res.heureDebut}</TableCell>
-                  <TableCell>{res.heureFin}</TableCell>
-                  <TableCell align="center">
-                    <Stack direction="row" spacing={1} justifyContent="center">
-                      <Tooltip title="Modifier">
-                        <IconButton color="primary" onClick={() => navigate(`/reservations/edit/${res.id}`)} size="small">
-                          <EditIcon />
-                        </IconButton>
-                      </Tooltip>
-                      <Tooltip title="Supprimer">
-                        <IconButton color="error" onClick={() => handleDeleteClick(res.id)} size="small">
-                          <DeleteIcon />
-                        </IconButton>
-                      </Tooltip>
-                    </Stack>
-                  </TableCell>
-                </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
+        <GenericTable
+          columns={columns}
+          data={reservations}
+          noDataMessage="Aucune réservation trouvée."
+          title=""  // tu peux ajouter un titre si tu veux
+        />
       )}
 
       {/* Dialog suppression */}

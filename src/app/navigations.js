@@ -5,18 +5,8 @@ const navigations = [
   path: "/statistiques",
 },
   { label: "PAGES", type: "label" },
-  {
-    name: "Auth",
-    icon: "security",
-    children: [
-      { name: "Sign in", iconText: "SI", path: "/session/signin" },
-      { name: "Sign up", iconText: "SU", path: "/session/signup" },
-      { name: "Forgot Password", iconText: "FP", path: "/session/forgot-password" },
-      { name: "Error", iconText: "404", path: "/session/404" }
-    ]
-  },
 
-   {
+ {
     name: "Abonnements",
     icon: "subscriptions",
     children: [
@@ -32,6 +22,39 @@ const navigations = [
       }
     ]
   },
+
+
+
+  {
+  name: "Accès",
+  icon: "event_available",
+  children: [
+    {
+      name: "Nouvel accès",
+      path: "/access/new",
+      icon: "add_circle",
+    },
+    {
+      name: "Liste des accès",
+      path: "/access",
+      icon: "list_alt",
+    },
+  ],
+},
+
+
+  {
+    name: "Auth",
+    icon: "security",
+    children: [
+      { name: "Sign in", iconText: "SI", path: "/session/signin" },
+      { name: "Sign up", iconText: "SU", path: "/session/signup" },
+      { name: "Forgot Password", iconText: "FP", path: "/session/forgot-password" },
+      { name: "Error", iconText: "404", path: "/session/404" }
+    ]
+  },
+
+  
  
 {
   name: "Utilisateurs",
@@ -50,12 +73,26 @@ const navigations = [
   ],
 },
 
-   {
-    name: "Access",
-    path: "/access",
-      icon: "event_note"
-    
+{
+    name: "Paiements",
+    icon: "payment",
+    children: [
+      {
+        name: "Effectuer un Paiement",
+        path: "/payements/new",
+        icon: "send",
+      },
+      
+      {
+        name: "Historique Paiements",
+        path: "/payements/historique",
+        icon: "credit_card",
+      },
+    ],
   },
+
+
+
 
  {
   name: "Réservations",
@@ -73,43 +110,70 @@ const navigations = [
     },
   ],
 },
-  {
-    name: "Paiements",
-    icon: "payment",
-    children: [
-      {
-        name: "Effectuer un Paiement",
-        path: "/payements",
-        icon: "send",
-      },
-      {
-        name: "Historique Paiements",
-        path: "/payements/historique",
-        icon: "credit_card",
-      },
-    ],
-  },
+  
 
+  
 
   {
   name: "Paramétrage",
   icon: "settings",
   children: [
+
     {
-      name: "Type d’abonnement",
+  name: "Types d’abonnement",
+  icon: "credit_card",
+  children: [
+    {
+      name: "Liste",
       path: "/parametrage/type-abonnement",
-      icon: "category",
     },
     {
-      name: "Règle de tarification",
+      name: "Ajouter",
+      path: "/parametrage/type-abonnement/new",
+    },
+  ],
+},
+
+
+    {
+  name: "Règle de tarification",
+  icon: "attach_money",
+  children: [
+    {
+      name: "Liste",
       path: "/parametrage/regle-tarification",
-      icon: "attach_money",
     },
     {
-      name: "Horaire d’ouverture",
-      path: "/parametrage/horaire-ouverture",
-      icon: "access_time",
+      name: "Ajouter",
+      path: "/parametrage/regle-tarification/new",
     },
+  ],
+},
+
+
+    
+   {
+  name: "Horaire d’ouverture",
+  icon: "access_time",
+  children: [
+    {
+      name: "Liste",
+      path: "/parametrage/horaire-ouverture",
+    },
+    {
+      name: "Ajouter",
+      path: "/parametrage/horaire-ouverture/new",
+    },
+  ],
+},
+
+
+
+
+
+
+
+
   ],
 },
 
