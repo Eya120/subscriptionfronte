@@ -3,6 +3,7 @@ import { Button, Box, CircularProgress, IconButton } from "@mui/material";
 import { Edit, Delete } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import GenericTable from "../../components/GenericTable";
+import { QRCodeCanvas } from "qrcode.react"; // ✅ Import QR Code
 
 const AbonnementList = () => {
   const [abonnements, setAbonnements] = useState([]);
@@ -46,6 +47,16 @@ const AbonnementList = () => {
     { header: "Date Début", field: "dateDebut" },
     { header: "Date Fin", field: "dateFin" },
     { header: "Tarif (€)", field: "tarif" },
+    { 
+      header: "QR Code", 
+      render: (row) => (
+        <QRCodeCanvas
+          value={row.codeAcces || `ABO-${row.id}`} // valeur encodée
+          size={64}
+          level="H"
+        />
+      )
+    },
     {
       header: "Actions",
       render: (row) => (

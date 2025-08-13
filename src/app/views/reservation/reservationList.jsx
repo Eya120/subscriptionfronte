@@ -6,7 +6,8 @@ import {
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useNavigate } from "react-router-dom";
-import GenericTable from "../../components/GenericTable"; // Chemin vers ton composant générique
+import GenericTable from "../../components/GenericTable";
+import { QRCodeCanvas } from "qrcode.react"; 
 
 const ReservationList = () => {
   const [reservations, setReservations] = useState([]);
@@ -50,7 +51,7 @@ const ReservationList = () => {
     }
   };
 
-  // Définition des colonnes pour GenericTable
+  // ✅ Colonnes avec QR Code
   const columns = [
     { header: "Utilisateur", field: "utilisateurNom" },
     { header: "Abonnement", field: "abonnementNom" },
@@ -62,6 +63,16 @@ const ReservationList = () => {
     },
     { header: "Heure début", field: "heureDebut" },
     { header: "Heure fin", field: "heureFin" },
+    { 
+      header: "QR Code", 
+      render: (row) => (
+        <QRCodeCanvas 
+          value={row.codeAcces || `RES-${row.id}`} // valeur encodée
+          size={64} // taille du QR Code
+          level="H" // niveau de correction
+        />
+      )
+    },
     {
       header: "Actions",
       render: (row) => (
@@ -102,7 +113,6 @@ const ReservationList = () => {
           columns={columns}
           data={reservations}
           noDataMessage="Aucune réservation trouvée."
-          title=""  // tu peux ajouter un titre si tu veux
         />
       )}
 

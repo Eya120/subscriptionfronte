@@ -42,9 +42,9 @@ import UserFormWrapper from "./views/utilisateurs/UserFormWrapper";
 
 
 // DASHBOARD PAGE
-const Analytics = Loadable(lazy(() => import("app/views/dashboard/Analytics")));
+const Analytics = Loadable(lazy(() => import("app/views/statistiques/statistiques")));
 const routes = [
-  { path: "/", element: <Navigate to="dashboard/default" /> },
+  { path: "/", element: <Navigate to="statistiques" /> },
   
   {
     element: (
