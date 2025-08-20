@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { Button, Box, CircularProgress, IconButton } from "@mui/material";
+import { Button, Box, CircularProgress, IconButton, Typography } from "@mui/material";
 import { Edit, Delete } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import GenericTable from "../../components/GenericTable";
-import { QRCodeCanvas } from "qrcode.react"; // ✅ Import QR Code
+import { QRCodeCanvas } from "qrcode.react"; // QR Code
 
 const AbonnementList = () => {
   const [abonnements, setAbonnements] = useState([]);
@@ -25,9 +25,7 @@ const AbonnementList = () => {
   const handleDelete = async (id) => {
     if (!window.confirm("Confirmer la suppression ?")) return;
     try {
-      const res = await fetch(`http://localhost:3000/api/abonnements/${id}`, {
-        method: "DELETE",
-      });
+      const res = await fetch(`http://localhost:3000/api/abonnements/${id}`, { method: "DELETE" });
       if (res.ok) {
         setAbonnements((prev) => prev.filter((a) => a.id !== id));
       }
@@ -47,15 +45,15 @@ const AbonnementList = () => {
     { header: "Date Début", field: "dateDebut" },
     { header: "Date Fin", field: "dateFin" },
     { header: "Tarif (€)", field: "tarif" },
-    { 
-      header: "QR Code", 
+    {
+      header: "QR Code",
       render: (row) => (
         <QRCodeCanvas
-          value={row.codeAcces || `ABO-${row.id}`} // valeur encodée
+          value={row.codeAcces || `ABO-${row.id}`}
           size={64}
           level="H"
         />
-      )
+      ),
     },
     {
       header: "Actions",
@@ -74,7 +72,10 @@ const AbonnementList = () => {
 
   return (
     <Box p={3}>
-      <Box display="flex" justifyContent="flex-end" mb={2}>
+      <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+        <Typography variant="h5" fontWeight="bold">
+          Liste des abonnements
+        </Typography>
         <Button variant="contained" color="primary" onClick={() => navigate("/abonnements/new")}>
           Ajouter un abonnement
         </Button>
@@ -85,11 +86,7 @@ const AbonnementList = () => {
           <CircularProgress />
         </Box>
       ) : (
-        <GenericTable
-          title="Liste des abonnements"
-          columns={columns}
-          data={abonnements}
-        />
+        <GenericTable columns={columns} data={abonnements} />
       )}
     </Box>
   );

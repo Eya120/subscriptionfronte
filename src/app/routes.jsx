@@ -41,6 +41,8 @@ import UserFormWrapper from "./views/utilisateurs/UserFormWrapper";
 
 
 
+
+
 // DASHBOARD PAGE
 const Analytics = Loadable(lazy(() => import("app/views/statistiques/statistiques")));
 const routes = [
@@ -56,14 +58,14 @@ const routes = [
     children: [
       // dashboard route
 
-      { path: "/dashboard/default", element: <Analytics />, auth: authRoles.admin },
+     
 
      { path: "/utilisateurs", element: <UserList />, auth: authRoles.admin },
      { path: "/utilisateurs/new", element: <UserFormWrapper mode="create" /> },
      { path: "/utilisateurs/edit/:id", element: <UserFormWrapper mode="edit" /> },
 
 
-      {path: "/abonnements", element: <AbonnementsList />, auth: authRoles.admin,},
+      {path: "/abonnements", element: <AbonnementsList />, auth: authRoles.admin},
       {path: "/abonnements/new",element: <AbonnementsForm mode="create" />,auth: authRoles.admin},
       {path: "/abonnements/edit/:id",element: <AbonnementsForm mode="edit" />,auth: authRoles.admin},
      
@@ -81,24 +83,32 @@ const routes = [
        
        {path: "/access", element: <AccessList />},
        {path: "/access/new",element: <AccessForm />},
-       {path: "/access/:id",element: <AccessForm />},
+       {path: "/access/edit/:id",element: <AccessForm />},
 
        { path: "/parametrage/type-abonnement", element: <TypeAbonnementList />, auth: authRoles.admin },
-       { path: "/parametrage/type-abonnement/new", element: <TypeAbonnementForm />, auth: authRoles.admin },
-       { path: "/parametrage/type-abonnement/:id", element: <TypeAbonnementForm />, auth: authRoles.admin }, 
+{ path: "/parametrage/type-abonnement/new", element: <TypeAbonnementForm />, auth: authRoles.admin },
+{ path: "/parametrage/type-abonnement/edit/:id", element: <TypeAbonnementForm />, auth: authRoles.admin },
 
-       {path: "/parametrage/regle-tarification", element: <RegleTarificationList />,auth: authRoles.admin},
-       {path: "/parametrage/regle-tarification/new",element: <RegleTarificationForm />,auth: authRoles.admin},
-       {path: "/parametrage/regle-tarification/edit/:id",element: <RegleTarificationForm />,auth: authRoles.admin},
+      { path: "/parametrage/regle-tarification", element: <RegleTarificationList />, auth: authRoles.admin },
+{ path: "/parametrage/regle-tarification/new", element: <RegleTarificationForm />, auth: authRoles.admin },
+{ path: "/parametrage/regle-tarification/edit/:id", element: <RegleTarificationForm />, auth: authRoles.admin },
 
        { path: "/parametrage/horaire-ouverture", element: <HoraireOuvertureList />, auth: authRoles.admin },
-       { path: "/parametrage/horaire-ouverture/new", element: <HoraireOuvertureForm />, auth: authRoles.admin },
-       { path: "/parametrage/horaire-ouverture/edit/:id", element: <HoraireOuvertureForm />, auth: authRoles.admin },
+{ path: "/parametrage/horaire-ouverture/new", element: <HoraireOuvertureForm />, auth: authRoles.admin },
+{ path: "/parametrage/horaire-ouverture/edit/:id", element: <HoraireOuvertureForm />, auth: authRoles.admin },
+
+
+        {path: "/statistiques",element: <Statistiques />},
 
 
 
-        {path: "/statistiques",element: <Statistiques />}
-   
+
+
+
+
+
+
+      
       
     ]
   },

@@ -89,7 +89,7 @@ const AbonnementForm = () => {
         setSuccessMessage("Abonnement mis à jour avec succès !");
       } else {
         // Créer
-        const res = await fetch("http://localhost:3000/api/abonnements", {
+        const res = await fetch("http://localhost:3000/api/abonnements/", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(values),

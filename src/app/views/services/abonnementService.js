@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = "http://localhost:3000/type-abonnement";
+const API_URL = "http://localhost:3000/api/type-abonnement";
 
 const getAllTypes = async (token) => {
   const res = await axios.get(API_URL, {

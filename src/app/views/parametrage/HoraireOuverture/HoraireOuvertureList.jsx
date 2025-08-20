@@ -12,7 +12,7 @@ const HoraireOuvertureList = () => {
   const fetchHoraires = async () => {
     setLoading(true);
     try {
-      const res = await axios.get("http://localhost:3000/horaire-ouverture", {
+      const res = await axios.get("http://localhost:3000/api/parametrage/horaire-ouverture/", {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
         },
@@ -30,7 +30,7 @@ const HoraireOuvertureList = () => {
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`http://localhost:3000/horaire-ouverture/${id}`, {
+      await axios.delete(`http://localhost:3000/api/parametrage/horaire-ouverture/${id}`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
         },

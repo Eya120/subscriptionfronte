@@ -2,8 +2,8 @@ import React, { useEffect, useState } from "react";
 import { Box, Button, IconButton, Tooltip, Typography } from "@mui/material";
 import { Edit, Delete, Add } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
-import GenericTable from "../../../components/GenericTable"; // Ajuste le chemin selon ton projet
+import GenericTable from "../../../components/GenericTable";
+import { regleTarificationService } from "../../services/regleTarificationService";
 
 const RegleTarificationList = () => {
   const [regles, setRegles] = useState([]);
@@ -11,12 +11,28 @@ const RegleTarificationList = () => {
 
   const fetchRegles = async () => {
     try {
-      const res = await axios.get("http://localhost:3000/regle-tarification", {
-        headers: { Authorization: `Bearer ${localStorage.getItem("accessToken")}` },
-      });
-      setRegles(res.data);
+      const res = await regleTarificationService.getAll();
+      const formatted = res.data.map((r) => ({
+        id: r.id,
+        typeAbonnementNom: r.typeAbonnementNom || "-", // Affiche "-" si aucun abonnement lié
+        jour: r.jour,
+        heureDebut: r.heureDebut,
+        heureFin: r.heureFin,
+        tarif: r.tarif,
+      }));
+      setRegles(formatted);
     } catch (error) {
       console.error("Erreur de chargement :", error);
+    }
+  };
+
+  const handleDelete = async (id) => {
+    if (!window.confirm("Voulez-vous vraiment supprimer cette règle ?")) return;
+    try {
+      await regleTarificationService.delete(id);
+      fetchRegles();
+    } catch (error) {
+      console.error("Erreur de suppression :", error);
     }
   };
 
@@ -24,24 +40,9 @@ const RegleTarificationList = () => {
     fetchRegles();
   }, []);
 
-  const handleDelete = async (id) => {
-    try {
-      await axios.delete(`http://localhost:3000/regle-tarification/${id}`, {
-        headers: { Authorization: `Bearer ${localStorage.getItem("accessToken")}` },
-      });
-      fetchRegles();
-    } catch (error) {
-      console.error("Erreur de suppression :", error);
-    }
-  };
-
   const columns = [
-    {
-      field: "jour",
-      header: "Jour",
-      cellStyle: { paddingLeft: "20px" },
-      headerStyle: { paddingLeft: "20px" },
-    },
+    { field: "typeAbonnementNom", header: "Type d'abonnement" },
+    { field: "jour", header: "Jour" },
     { field: "heureDebut", header: "Heure début" },
     { field: "heureFin", header: "Heure fin" },
     { field: "tarif", header: "Tarif (€)" },
@@ -55,17 +56,13 @@ const RegleTarificationList = () => {
             <IconButton
               size="small"
               color="primary"
-              onClick={() => navigate(`/parametrage/regle-tarification/edit/${row.id}`)}
+              onClick={() => navigate(`/parametrage/regle-tarification/${row.id}`)}
             >
               <Edit />
             </IconButton>
           </Tooltip>
           <Tooltip title="Supprimer">
-            <IconButton
-              size="small"
-              color="error"
-              onClick={() => handleDelete(row.id)}
-            >
+            <IconButton size="small" color="error" onClick={() => handleDelete(row.id)}>
               <Delete />
             </IconButton>
           </Tooltip>
@@ -76,11 +73,9 @@ const RegleTarificationList = () => {
 
   return (
     <Box m={4}>
-
-       <Typography variant="h4" mb={3} textAlign="center" fontWeight="bold">
-                Règles de tarification
-            </Typography>
-      
+      <Typography variant="h4" mb={3} textAlign="center" fontWeight="bold">
+        Règles de tarification
+      </Typography>
 
       <Box display="flex" justifyContent="flex-end" mb={2}>
         <Button
