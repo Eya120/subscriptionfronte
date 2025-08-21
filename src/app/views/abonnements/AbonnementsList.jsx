@@ -41,7 +41,11 @@ const AbonnementList = () => {
   const columns = [
     { header: "ID", field: "id" },
     { header: "Utilisateur ID", field: "utilisateurId" },
-    { header: "Type", field: "typeAbonnement" },
+   {
+  header: "Type",
+  render: (row) => row.typeAbonnement?.nom || "—",
+},
+
     { header: "Date Début", field: "dateDebut" },
     { header: "Date Fin", field: "dateFin" },
     { header: "Tarif (€)", field: "tarif" },
@@ -59,7 +63,7 @@ const AbonnementList = () => {
       header: "Actions",
       render: (row) => (
         <Box display="flex" justifyContent="center">
-          <IconButton onClick={() => navigate(`/abonnements/${row.id}`)}>
+          <IconButton onClick={() => navigate(`/abonnements/edit/${row.id}`)}>
             <Edit />
           </IconButton>
           <IconButton color="error" onClick={() => handleDelete(row.id)}>

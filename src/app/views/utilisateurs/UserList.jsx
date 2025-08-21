@@ -3,12 +3,33 @@ import GenericTable from "../../components/GenericTable";
 
 const UserList = () => {
   const [users, setUsers] = useState([]);
+  const [error, setError] = useState("");
 
   useEffect(() => {
-    fetch(" http://localhost:3000/api/utilisateurs")
-      .then((res) => res.json())
-      .then(setUsers)
-      .catch(console.error);
+    const token = localStorage.getItem("token"); // Récupération du token
+
+    fetch("http://localhost:3000/api/utilisateurs", {
+      headers: {
+        Authorization: `Bearer ${token}`, // Envoi du token dans l'entête
+      },
+    })
+      .then((res) => {
+        if (!res.ok) {
+          if (res.status === 401) {
+            throw new Error("Non autorisé - veuillez vous connecter");
+          } else {
+            throw new Error(`Erreur HTTP ${res.status}`);
+          }
+        }
+        return res.json();
+      })
+      .then((data) => {
+        setUsers(data);
+      })
+      .catch((err) => {
+        setError(err.message);
+        console.error("Erreur fetch utilisateurs :", err);
+      });
   }, []);
 
   const columns = [
@@ -26,11 +47,10 @@ const UserList = () => {
   ];
 
   return (
-    <GenericTable
-      title="Liste des utilisateurs"
-      columns={columns}
-      data={users}
-    />
+    <div>
+      {error && <p style={{ color: "red" }}>{error}</p>}
+      <GenericTable title="Liste des utilisateurs" columns={columns} data={users} />
+    </div>
   );
 };
 

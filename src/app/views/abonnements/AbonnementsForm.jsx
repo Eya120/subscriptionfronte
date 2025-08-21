@@ -24,8 +24,15 @@ const abonnementSchema = Yup.object().shape({
     .min(0, "Le tarif doit être positif"),
 });
 
+// Liste statique des types d'abonnement (comme dans ton deuxième code)
+const typesAbonnement = [
+  { id: 1, nom: "Abonnement Mensuel" },
+  { id: 2, nom: "Abonnement Annuel" },
+  { id: 3, nom: "Abonnement Hebdomadaire" }
+];
+
 const AbonnementForm = () => {
-  const { id } = useParams(); // id si modification
+  const { id } = useParams();
   const navigate = useNavigate();
 
   const [utilisateurs, setUtilisateurs] = useState([]);
@@ -44,27 +51,37 @@ const AbonnementForm = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const resUsers = await fetch("http://localhost:3000/api/utilisateurs");
+        const token = localStorage.getItem("token"); // adapte selon ta gestion de token
+
+        // Chargement des utilisateurs
+        const resUsers = await fetch("http://localhost:3000/api/utilisateurs", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
         if (!resUsers.ok) throw new Error("Erreur chargement utilisateurs");
         const usersData = await resUsers.json();
         setUtilisateurs(usersData);
 
+        // Chargement de l'abonnement si modification
         if (id) {
-          const resAbonnement = await fetch(`http://localhost:3000/api/abonnements/${id}`);
+          const resAbonnement = await fetch(
+            `http://localhost:3000/api/abonnements/${id}`,
+            { headers: { Authorization: `Bearer ${token}` } }
+          );
           if (!resAbonnement.ok) throw new Error("Erreur chargement abonnement");
           const abonnementData = await resAbonnement.json();
 
           setInitialValues({
             utilisateurId: abonnementData.utilisateurId || "",
-            typeAbonnement: abonnementData.typeAbonnement || "",
-            dateDebut: abonnementData.dateDebut ? abonnementData.dateDebut.split("T")[0] : "",
-            dateFin: abonnementData.dateFin ? abonnementData.dateFin.split("T")[0] : "",
+            typeAbonnement: abonnementData.typeAbonnement?.id || "",
+            dateDebut: abonnementData.dateDebut?.split("T")[0] || "",
+            dateFin: abonnementData.dateFin?.split("T")[0] || "",
             tarif: abonnementData.tarif != null ? abonnementData.tarif : "",
           });
         }
+
         setLoading(false);
       } catch (error) {
-        setErrorMessage(error.message || "Erreur chargement données");
+        setErrorMessage(error.message || "Erreur chargement des données.");
         setLoading(false);
       }
     };
@@ -78,31 +95,33 @@ const AbonnementForm = () => {
     setSuccessMessage("");
 
     try {
-      if (id) {
-        // Modifier
-        const res = await fetch(`http://localhost:3000/api/abonnements/${id}`, {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(values),
-        });
-        if (!res.ok) throw new Error("Erreur mise à jour abonnement");
-        setSuccessMessage("Abonnement mis à jour avec succès !");
-      } else {
-        // Créer
-        const res = await fetch("http://localhost:3000/api/abonnements/", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(values),
-        });
-        if (!res.ok) throw new Error("Erreur création abonnement");
-        setSuccessMessage("Abonnement créé avec succès !");
-        resetForm();
-      }
+      const token = localStorage.getItem("token"); // idem ici
+
+      const method = id ? "PUT" : "POST";
+      const url = id
+        ? `http://localhost:3000/api/abonnements/${id}`
+        : "http://localhost:3000/api/abonnements/";
+
+      const res = await fetch(url, {
+        method,
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(values),
+      });
+
+      if (!res.ok)
+        throw new Error(id ? "Erreur mise à jour abonnement" : "Erreur création abonnement");
+
+      setSuccessMessage(id ? "Abonnement mis à jour avec succès !" : "Abonnement créé avec succès !");
+      if (!id) resetForm();
 
       setTimeout(() => navigate("/abonnements"), 1000);
     } catch (error) {
       setErrorMessage(error.message || "Erreur lors de la sauvegarde");
     }
+
     setSubmitLoading(false);
   };
 
@@ -164,15 +183,21 @@ const AbonnementForm = () => {
               <MenuItem value="">
                 <em>Choisir un utilisateur</em>
               </MenuItem>
-              {utilisateurs.map((user) => (
-                <MenuItem key={user.id} value={user.id}>
-                  {user.nom} {user.prenom}
-                </MenuItem>
-              ))}
+              {Array.isArray(utilisateurs) ? (
+                utilisateurs.map((user) => (
+                  <MenuItem key={user.id} value={user.id}>
+                    {user.nom} {user.prenom}
+                  </MenuItem>
+                ))
+              ) : (
+                <MenuItem disabled>Aucun utilisateur</MenuItem>
+              )}
             </TextField>
 
+            {/* Ici : zone type d'abonnement en liste déroulante statique */}
             <TextField
-              label="Type d’abonnement"
+              select
+              label="Type d'abonnement"
               name="typeAbonnement"
               fullWidth
               margin="normal"
@@ -181,7 +206,16 @@ const AbonnementForm = () => {
               onBlur={handleBlur}
               error={touched.typeAbonnement && Boolean(errors.typeAbonnement)}
               helperText={touched.typeAbonnement && errors.typeAbonnement}
-            />
+            >
+              <MenuItem value="">
+                <em>Choisir un type</em>
+              </MenuItem>
+              {typesAbonnement.map((type) => (
+                <MenuItem key={type.id} value={type.id}>
+                  {type.nom}
+                </MenuItem>
+              ))}
+            </TextField>
 
             <TextField
               label="Date début"
@@ -225,20 +259,13 @@ const AbonnementForm = () => {
               inputProps={{ min: 0, step: "0.01" }}
             />
 
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: "flex-end",
-                gap: 2,
-                mt: 3,
-              }}
-            >
+            <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 2, mt: 3 }}>
               <Button
                 variant="outlined"
                 onClick={() => navigate("/abonnements")}
                 disabled={submitLoading}
                 fullWidth
-                 startIcon={submitLoading && <CircularProgress size={20} />}
+                startIcon={submitLoading && <CircularProgress size={20} />}
               >
                 Annuler
               </Button>
@@ -248,7 +275,7 @@ const AbonnementForm = () => {
                 type="submit"
                 fullWidth
                 disabled={submitLoading}
-                 startIcon={submitLoading && <CircularProgress size={20} />}
+                startIcon={submitLoading && <CircularProgress size={20} />}
               >
                 {id ? "Modifier" : "Créer"}
               </Button>

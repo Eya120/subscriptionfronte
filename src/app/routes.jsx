@@ -65,11 +65,11 @@ const routes = [
      { path: "/utilisateurs/edit/:id", element: <UserFormWrapper mode="edit" /> },
 
 
-      {path: "/abonnements", element: <AbonnementsList />, auth: authRoles.admin},
-      {path: "/abonnements/new",element: <AbonnementsForm mode="create" />,auth: authRoles.admin},
-      {path: "/abonnements/edit/:id",element: <AbonnementsForm mode="edit" />,auth: authRoles.admin},
-     
-      
+     { path: "/abonnements", element: <AbonnementsList />, auth: authRoles.admin },
+{ path: "/abonnements/new", element: <AbonnementsForm mode="create" />, auth: authRoles.admin },
+{ path: "/abonnements/edit/:id", element: <AbonnementsForm mode="edit" />, auth: authRoles.admin },
+{ path: "/abonnements/:id", element: <AbonnementsForm mode="edit" />, auth: authRoles.admin },
+
       { path: '/reservation',element: <ReservationList />},
       { path: '/reservation/liste', element: <ReservationList />},
       {  path: '/reservation/new', element: <ReservationForm />},
