@@ -1,35 +1,42 @@
 import React, { useEffect, useState } from "react";
+import { Button, Box, CircularProgress, IconButton, Typography } from "@mui/material";
+import { Edit } from "@mui/icons-material";
+import { useNavigate } from "react-router-dom";
 import GenericTable from "../../components/GenericTable";
 
 const UserList = () => {
   const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const navigate = useNavigate();
+
+  const fetchUsers = async () => {
+    const token = localStorage.getItem("token");
+    try {
+      const res = await fetch("http://localhost:3000/api/utilisateurs", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      if (!res.ok) {
+        if (res.status === 401) {
+          throw new Error("Non autorisé - veuillez vous connecter");
+        } else {
+          throw new Error(`Erreur HTTP ${res.status}`);
+        }
+      }
+      const data = await res.json();
+      setUsers(data);
+    } catch (err) {
+      setError(err.message);
+      console.error("Erreur fetch utilisateurs :", err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const token = localStorage.getItem("token"); // Récupération du token
-
-    fetch("http://localhost:3000/api/utilisateurs", {
-      headers: {
-        Authorization: `Bearer ${token}`, // Envoi du token dans l'entête
-      },
-    })
-      .then((res) => {
-        if (!res.ok) {
-          if (res.status === 401) {
-            throw new Error("Non autorisé - veuillez vous connecter");
-          } else {
-            throw new Error(`Erreur HTTP ${res.status}`);
-          }
-        }
-        return res.json();
-      })
-      .then((data) => {
-        setUsers(data);
-      })
-      .catch((err) => {
-        setError(err.message);
-        console.error("Erreur fetch utilisateurs :", err);
-      });
+    fetchUsers();
   }, []);
 
   const columns = [
@@ -41,16 +48,36 @@ const UserList = () => {
     {
       header: "Actions",
       render: (row) => (
-        <button onClick={() => console.log("Modifier", row.id)}>Modifier</button>
+        <Box display="flex" justifyContent="center">
+          <IconButton onClick={() => navigate(`/utilisateurs/edit/${row.id}`)}>
+            <Edit />
+          </IconButton>
+        </Box>
       ),
     },
   ];
 
   return (
-    <div>
-      {error && <p style={{ color: "red" }}>{error}</p>}
-      <GenericTable title="Liste des utilisateurs" columns={columns} data={users} />
-    </div>
+    <Box p={3}>
+      <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+        <Typography variant="h5" fontWeight="bold">
+          Liste des utilisateurs
+        </Typography>
+        <Button variant="contained" color="primary" onClick={() => navigate("/utilisateurs/new")}>
+          Ajouter un utilisateur
+        </Button>
+      </Box>
+
+      {error && <Typography color="error" mb={2}>{error}</Typography>}
+
+      {loading ? (
+        <Box display="flex" justifyContent="center" mt={5}>
+          <CircularProgress />
+        </Box>
+      ) : (
+        <GenericTable columns={columns} data={users} />
+      )}
+    </Box>
   );
 };
 

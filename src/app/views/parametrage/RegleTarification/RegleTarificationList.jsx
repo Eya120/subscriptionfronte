@@ -12,17 +12,26 @@ const RegleTarificationList = () => {
   const fetchRegles = async () => {
     try {
       const res = await regleTarificationService.getAll();
+
+      // Log des données reçues du backend
+      console.log("📦 Données reçues du backend : ", res.data);
+
+      // Formatage des données pour la table
       const formatted = res.data.map((r) => ({
         id: r.id,
-        typeAbonnementNom: r.typeAbonnementNom || "-", // Affiche "-" si aucun abonnement lié
+        typeAbonnementNom: r.typeAbonnementNom || "-", // Vérifie ici le nom exact reçu
         jour: r.jour,
         heureDebut: r.heureDebut,
         heureFin: r.heureFin,
         tarif: r.tarif,
       }));
+
+      // Log des données envoyées au tableau
+      console.log("🧾 Données envoyées au tableau : ", formatted);
+
       setRegles(formatted);
     } catch (error) {
-      console.error("Erreur de chargement :", error);
+      console.error("❌ Erreur de chargement :", error);
     }
   };
 

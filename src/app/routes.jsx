@@ -38,15 +38,17 @@ import Statistiques from "./views/Statistiques/statistiques"; // adapte le chemi
 import ReservationFormWrapper from "./views/reservation/ReservationFormWrapper";
 import UserFormWrapper from "./views/utilisateurs/UserFormWrapper";
 
+import Login from "./views/utilisateurs/login/login"; 
 
 
 
 
 
 // DASHBOARD PAGE
-const Analytics = Loadable(lazy(() => import("app/views/statistiques/statistiques")));
+
 const routes = [
   { path: "/", element: <Navigate to="statistiques" /> },
+  { path: "/utilisateurs/login", element: <Login /> },
   
   {
     element: (
@@ -56,13 +58,10 @@ const routes = [
     ),
 
     children: [
-      // dashboard route
-
-     
-
+   
      { path: "/utilisateurs", element: <UserList />, auth: authRoles.admin },
-     { path: "/utilisateurs/new", element: <UserFormWrapper mode="create" /> },
-     { path: "/utilisateurs/edit/:id", element: <UserFormWrapper mode="edit" /> },
+      { path: "/utilisateurs/new", element: <UserFormWrapper mode="create" /> },
+      { path: "/utilisateurs/edit/:id", element: <UserFormWrapper mode="edit" /> },
 
 
      { path: "/abonnements", element: <AbonnementsList />, auth: authRoles.admin },
@@ -99,6 +98,8 @@ const routes = [
 
 
         {path: "/statistiques",element: <Statistiques />},
+
+        { path: "/utilisateurs/login", element: <Login /> },
 
 
 
